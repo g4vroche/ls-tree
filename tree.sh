@@ -62,6 +62,11 @@ echo $bold`pwd`$normal
 for FILE in `ls -R --file-type *`; do
 
     ISDIR=`echo $FILE | grep "[:/]$"`
+    
+    if [ $ISDIR ]; then
+        # Rely on slashes to count depth
+        DEPTH=$(echo -n $FILE|sed 's/[^\/]//g' |wc -m)
+    fi
 
     if [ $MAXDEPTH -eq 0 ] || [ $DEPTH -lt $MAXDEPTH ]; then
 
@@ -70,19 +75,13 @@ for FILE in `ls -R --file-type *`; do
             echo "$STYLE$INDENT $FILE"
 
         else
-            
             # Check if we want to display the directory now 
             # and remove slash and semi column from filename
             FILENAME=$(echo -n $FILE|grep -o '[^\/]*:$'|sed -e 's/[\/:]//g')
 
             if [ $FILENAME ]; then
-                
-                # Rely on slashes to count depth
-                DEPTH=$(echo -n $FILE|sed 's/[^\/]//g' |wc -m)
-            
                 # Add awesome indentation
                 STYLE=$(printf "%$DEPTH""s" ""|sed "s/ /$INDENT/g")
-
                 echo "$STYLE $bold$FILENAME$normal"
             fi
         fi
